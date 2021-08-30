@@ -1,0 +1,64 @@
+from asyncio.windows_events import NULL
+import discord
+import random
+from discord import message
+import numpy as np
+from discord.ext import commands
+
+client = commands.Bot(command_prefix="!")
+
+tkn = "-"
+
+@client.event
+async def on_ready():
+    print("pronto")
+
+@client.command()
+async def ajuda(ctx):
+    await ctx.send("Para rolar os dados digite !roll xdy*z\nx = número de vezes que o dado será rodado\nd = dado\ny = tamanho do dado\nz = número de vezes que essa combinação será jogada(se for apenas uma vez não tem necessidade de botar *)")
+
+@client.command()
+async def roll(ctx, dado: str):
+    soma,ran, ran2, cort = 0, 0, 0, 0
+    z = "0"
+    x = "0"
+    y = "0"
+    while dado[ran2] != "*":
+        if ran2+1 >= len(dado):
+            cort = 1
+            break
+        ran2 += 1
+    while dado[ran] != "d":
+        ran += 1
+    for i in range(ran):
+        x += dado[i]
+    x = int(x)
+    for i in range(ran+1, ran2, +1):
+        y += dado[i]
+    if cort == 1:
+        y += dado[len(dado)-1]
+    y = int(y)
+    if cort == 1:
+        z = 1
+    else:
+        ran2 += 1
+        while (len(dado) > ran2):
+            z += dado[ran2]
+            ran2 += 1
+    z = int(z)
+    rol = []
+    max = 0
+    for b in range(z): 
+        for i in range(x):
+            num = random.randrange(1, y+1)
+            soma += num
+            if num > max:
+                max = num
+            rol.append(num)   
+        rolstr = ', '.join(str(e) for e in rol)
+        await ctx.send("Maior n: **{}** <-- [ {} ] {}d{} \nSoma: *{}*".format(max, rolstr, x, y, soma))
+        rol = []
+        max = 0
+        soma = 0
+
+client.run(tkn)
